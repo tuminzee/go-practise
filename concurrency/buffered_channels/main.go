@@ -5,7 +5,6 @@ import (
 )
 
 func main() {
-	const v = "hello world"
 	c := make(chan int, 4)
 
 	go func(c chan int) {
