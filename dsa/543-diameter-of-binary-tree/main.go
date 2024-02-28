@@ -56,6 +56,7 @@ func travel(node *TreeNode) int {
 }
 
 func diameterOfBinaryTree(root *TreeNode) int {
+	Dia = 0
 	travel(root)
 	return Dia
 }
