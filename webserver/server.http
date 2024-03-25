@@ -1,0 +1,6 @@
+GET http://localhost:8080/ready
+Accept: application/json
+
+###
+GET http://localhost:8080/
+Accept: application/json
