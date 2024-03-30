@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	pongWait       = 60 * time.Second
+	pongWait       = 10 * time.Second
 	pingInterval   = (pongWait * 9) / 10
 	maxMessageSize = 512
 )
@@ -35,23 +35,14 @@ func (c *Client) readMessages() {
 		c.manager.removeClient(c)
 	}()
 
+	c.connection.SetReadLimit(int64(maxMessageSize))
+
 	if err := c.connection.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		log.Println(err)
 		return
 	}
-
-	c.connection.SetReadLimit(int64(maxMessageSize))
-	err := c.connection.SetReadDeadline(time.Now().Add(pongWait))
-	if err != nil {
-		return
-	}
-	c.connection.SetPongHandler(func(string) error {
-		err := c.connection.SetReadDeadline(time.Now().Add(pongWait))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	// Configure how to handle Pong responses
+	c.connection.SetPongHandler(c.pongHandler)
 
 	for {
 		_, payload, err := c.connection.ReadMessage()
@@ -91,11 +82,12 @@ func (c *Client) readMessages() {
 }
 
 func (c *Client) writeMessages() {
-	ticker := time.NewTimer(pingInterval)
-
+	// Create a ticker that triggers a ping at given interval
+	ticker := time.NewTicker(pingInterval)
 	defer func() {
-		c.manager.removeClient(c)
 		ticker.Stop()
+		// Graceful close if this triggers a closing
+		c.manager.removeClient(c)
 	}()
 
 	for {
@@ -119,8 +111,10 @@ func (c *Client) writeMessages() {
 			}
 			log.Println("message sent")
 		case <-ticker.C:
+			log.Println("ping")
+			// Send the Ping
 			if err := c.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				log.Println("error WriteMessage pingMessage in writeMessage", err)
+				log.Println("write msg: ", err)
 				return
 			}
 
@@ -128,7 +122,9 @@ func (c *Client) writeMessages() {
 	}
 }
 
-//func (c *Client) pongHandler(_ string) error {
-//	log.Printf("pong from client")
-//	return c.connection.SetReadDeadline(time.Now().Add(pongWait))
-//}
+// pongHandler is used to handle PongMessages for the Client
+func (c *Client) pongHandler(_ string) error {
+	// Current time + Pong Wait time
+	log.Println("pong")
+	return c.connection.SetReadDeadline(time.Now().Add(pongWait))
+}
