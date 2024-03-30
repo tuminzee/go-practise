@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>wss</title>
+
+</head>
+<body>
+    <h1>wss</h1>
+
+    <div>
+        <h1 id="chat-header" >
+            currently in the chat: general
+        </h1>
+        <form  id="chatroom-selection">
+            <label for="chatroom">chatroom</label>
+            <input type="text" id="chatroom" name="chatroom"><br><br>
+            <input type="submit" value="change chatroom">
+        </form>
+
+        <br>
+
+        <label for="chat-messages"></label>
+        <textarea class="message-area"
+                  id="chat-messages"
+                  readonly
+                  name="chat-messages"
+                 rows="4"
+                 cols="50"
+                 placeholder="welcome to chatroom"
+        ></textarea>
+
+        <br>
+
+
+        <form id="chatroom-message" >
+            <label for="message">message:</label>
+            <input type="text" id="message" name="message"><br><br>
+            <input type="submit" value="send message">
+        </form>
+    </div>
+
+    <script>
+        const selectedChat = "general";
+        const textAreaDOM = document.getElementById("chat-messages")
+        let wsConn
+
+        class Event {
+            constructor(type, payload) {
+                this.type = type
+                this.payload = payload
+            }
+        }
+
+        function routeEvent(event){
+            if (event.type === undefined) {
+                alert("no type field")
+            }
+
+            switch (event.type) {
+                case "new_message":
+                    console.log("new message")
+
+                    if (textAreaDOM.value === "") {
+                        textAreaDOM.value = event.payload
+                    } else{
+                        textAreaDOM.value += "\n" + event.payload
+                    }
+
+                    break
+                default:
+                    alert("unsupported event type")
+                    break
+            }
+        }
+
+        function sendEvent(eventName, payload) {
+            const event = new Event(eventName, payload)
+            wsConn.send(JSON.stringify(event))
+        }
+
+        function changeChatRoom(){
+            let newChat = document.getElementById("chatroom")
+            if (newChat != null && newChat.value !== selectedChat) {
+                console.log(newChat)
+            }
+            return false
+        }
+
+        function sendMessage(){
+            let newMessage = document.getElementById("message")
+            if (newMessage != null) {
+               sendEvent("send_message", newMessage.value)
+            }
+            return false
+
+        }
+
+        window.onload = function () {
+            document.getElementById("chatroom-selection").onsubmit = changeChatRoom
+            document.getElementById("chatroom-message").onsubmit = sendMessage
+            // const chatTextArea = document.getElementById("chat-messages")
+
+            if(window["WebSocket"]) {
+                console.log("supports wss")
+                // alert("supports ws")
+                wsConn = new WebSocket("ws://" + document.location.host + "/ws")
+
+
+                wsConn.onmessage = function(msgEvent) {
+                    // console.log({msgEvent})
+                    const event = Object.assign(new Event, JSON.parse(msgEvent.data))
+
+                    // console.log({event})
+
+                    routeEvent(event)
+                    // console.log(msgEvent)
+                    // if (chatTextArea.value === "") {
+                    //     chatTextArea.value = msgEvent.data
+                    // } else {
+                    //     chatTextArea.value = chatTextArea.value + "\n" + msgEvent.data
+                    // }
+                }
+
+
+
+            } else {
+                alert("browser does not support web sockets yet")
+            }
+
+        }
+
+
+    </script>
+</body>
+</html>
