@@ -3,11 +3,11 @@ package main
 import "fmt"
 
 func main() {
-	var board [][]byte = [][]byte{
-		[]byte{'A', 'B', 'C', 'D', 'E'},
-		[]byte{'E', 'F', 'G', 'H', 'I'},
+	board := [][]byte{
+		{'A', 'B', 'C', 'D', 'E'},
+		{'E', 'F', 'G', 'H', 'I'},
 	}
-	var word string = "ABCDEIHGFE"
+	var word = "ABCDEIHGFE"
 
 	fmt.Println(exist(board, word))
 
