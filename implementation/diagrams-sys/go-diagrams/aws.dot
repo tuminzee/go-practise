@@ -1,0 +1,15 @@
+digraph root {
+	fontcolor="#2D3436";
+	fontname="Sans-Serif";
+	fontsize=13;
+	label=aws;
+	nodesep=0.6;
+	pad=2;
+	rankdir=LR;
+	ranksep=0.75;
+	splines=ortho;
+	snssbmtr->gelgbdbn[ color="#7B8894", dir=forward, fontcolor="#2D3436", fontname="Sans-Serif", fontsize=13 ];
+	gelgbdbn [ fixedsize=true, fontcolor="#2D3436", fontname="Sans-Serif", fontsize=13, height=1.7999999999999998, image="assets/aws/compute/elastic-container-service.png", imagescale=true, label=ECS, labelloc=b, shape=none, style=rounded, width=1.4 ];
+	snssbmtr [ fixedsize=true, fontcolor="#2D3436", fontname="Sans-Serif", fontsize=13, height=1.7999999999999998, image="assets/aws/network/elastic-load-balancing.png", imagescale=true, label=LB, labelloc=b, shape=none, style=rounded, width=1.4 ];
+
+}
