@@ -2,3 +2,4 @@
 
 .idea
 implementation/xmpp-go/node_modules
+implementation/mqtt-go/node_modules
