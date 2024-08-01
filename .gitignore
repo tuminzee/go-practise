@@ -1,3 +1,4 @@
 *.env
 
 .idea
+implementation/xmpp-go/node_modules

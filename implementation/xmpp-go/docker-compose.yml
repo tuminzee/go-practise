@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root-pass
+      POSTGRES_DB: tigasedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - tigase-postgres:/var/lib/postgresql/data
+
+  tigase-server:
+    image: tigase/tigase-xmpp-server
+    container_name: tigase-server
+    ports:
+      - "8080:8080"
+      - "5222:5222"
+    environment:
+      - DB_ROOT_USER=root
+      - DB_ROOT_PASS=root-pass
+    depends_on:
+      - postgres
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    ports:
+      - "80:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+volumes:
+  tigase-postgres:
+  pgadmin_data:
