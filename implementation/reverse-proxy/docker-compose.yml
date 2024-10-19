@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3000
+    labels:
+      - "traefik.http.routers.app.rule=Host(`app.localhost`)"
+      - "traefik.http.routers.app.tls=true"
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
+      - "traefik.http.services.app.loadbalancer.sticky=true"
+    depends_on:
+      - reverse-proxy
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+
+  reverse-proxy:
+    image: traefik:v3.1
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"  # Add HTTPS entry point
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"  # Enable ACME TLS challenge
+      - "--certificatesresolvers.myresolver.acme.email=emailtumin@gmail.com"  # Replace with your email
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"  # Storage for certificates
+    ports:
+      - "80:80"      # HTTP port for routing traffic
+      - "443:443"    # HTTPS port for routing traffic
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt:/letsencrypt  # Volume for storing certificates
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.localhost`)"  # Add rule for dashboard
+      - "traefik.http.routers.dashboard.entrypoints=websecure"  # Use HTTPS entry point
+      - "traefik.http.routers.dashboard.service=api@internal"  # Use Traefik's internal API service
+      - "traefik.http.routers.dashboard.tls=true"  # Enable TLS for the dashboard

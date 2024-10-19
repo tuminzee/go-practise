@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"github.com/joho/godotenv"
-	tele "gopkg.in/telebot.v3"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
+	tele "gopkg.in/telebot.v3"
 )
 
 func main() {
@@ -24,23 +24,10 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	log.Println("Bot is starting...")
+	log.Println(b.Me)
 
-	b.Handle("/start", func(c tele.Context) error {
-		////return c.Send("Hello world!")
-		//inlineBtn := &tele.InlineButton{
-		//	WebApp: &tele.WebApp{
-		//		URL: "https://predict.wagmi11.com/",
-		//	},
-		//}
-		m := b.NewMarkup()
-		if err != nil {
-			fmt.Println(err)
-		}
-		return c.Send(m)
-	})
-
-	fmt.Println(b)
-
+	log.Println("Bot is now running. Press Ctrl-C to exit.")
 	b.Start()
 
 }
