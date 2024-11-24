@@ -3,3 +3,10 @@
 .idea
 implementation/xmpp-go/node_modules
 implementation/mqtt-go/node_modules
+implementation/quote/hello/hello
+implementation/go-web/tmp/main
+implementation/go-web/bin/air
+
+
+node_modules
+.DS_Store
